@@ -17,6 +17,9 @@ import pandas as pd
 import numpy as np
 import opendatasets as od
 import matplotlib.pyplot as plt
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
 
 """## Data Loading"""
 
@@ -74,7 +77,16 @@ rating.describe()
 print("Lowest rating: ", min(rating.rating))
 print("Biggest rating: ", max(rating.rating))
 
-print("Total # of user: ", len(rating.user_id.unique()))
+num_users = len(rating.user_id.unique())
+num_anime = len(rating.anime_id.unique())
+
+print("Total # of user: ", num_users)
+print("Total # of anime: ", num_anime)
+
+plt.figure(figsize=(8, 6))
+plt.bar(['Users', 'Anime'], [num_users, num_anime], color=['blue', 'green'])
+plt.title("Total numbers of Users and Anime")
+plt.show()
 
 """# Data Preparation
 
@@ -136,13 +148,78 @@ anime_final
 ### Reduce the size of rating dataframe
 """
 
+sample_size = int(len(rating) * 0.0005) # reduce the dataset into 0.05% of the original dataset size
 
+rating = rating.sample(n=sample_size, random_state=69)
+
+print("The size of rating dataset: ", len(rating))
+
+num_users = len(rating.user_id.unique())
+num_anime = len(rating.anime_id.unique())
+
+print("Total # of users after reduction: ", num_users)
+print("Total # of anime after reduction: ", num_anime)
+
+"""### Encode the user id and anime id"""
+
+user_ids = rating['user_id'].unique().tolist()
+print("List user_id: ", user_ids)
+
+user_to_user_encoded = {x: i for i, x in enumerate(user_ids)}
+print("Encoded user_id: ", user_to_user_encoded)
+
+user_encoded_to_user = {i: x for i, x in enumerate(user_ids)}
+print("Decoded user_id: ", user_encoded_to_user)
+
+anime_ids = rating['anime_id'].unique().tolist()
+print("List anime_id: ", anime_ids)
+
+anime_to_anime_encoded = {x: i for i, x in enumerate(anime_ids)}
+print("Encoded anime_id: ", anime_to_anime_encoded)
+
+anime_encoded_to_anime = {i: x for i, x in enumerate(anime_ids)}
+print("Decoded anime_id: ", anime_encoded_to_anime)
+
+# Map the encoded user_id and anime_id into new columns
+rating['user'] = rating['user_id'].map(user_to_user_encoded)
+rating['anime'] = rating['anime_id'].map(anime_to_anime_encoded)
 
 """### Change -1 rating to 0"""
 
 rating['rating'] = rating['rating'].replace(-1, 0)
-print("Rating paling kecil: ", min(rating.rating))
-print("Rating paling besar: ", max(rating.rating))
+
+min_rating = min(rating['rating'])
+max_rating = max(rating['rating'])
+
+print("Lowest rating: ", min_rating)
+print("Highest rating: ", max_rating)
+
+# change to float
+rating['rating'] = rating['rating'].values.astype(np.float32)
+
+"""### Split into train and validation
+
+before splitting, randomize the data first
+"""
+
+rating = rating.sample(frac=1, random_state=69)
+rating
+
+x = rating[['user', 'anime']].values
+
+# Normalization using min max scaler
+y = rating['rating'].apply(lambda x: (x - min_rating) / (max_rating - min_rating)).values
+
+train_indices = int(0.8 * rating.shape[0])
+x_train, x_val, y_train, y_val = (
+    x[:train_indices],
+    x[train_indices:],
+    y[:train_indices],
+    y[train_indices:]
+)
+
+print("Training data: ", x)
+print("Validation data: ", y)
 
 """# Model Development with Content-Based Filtering"""
 
@@ -153,13 +230,13 @@ data.sample(5)
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-tf = TfidfVectorizer()
+tfv = TfidfVectorizer()
 
-tf.fit(data['genre_str'])
+tfv.fit(data['genre_str'])
 
-tf.get_feature_names_out()
+tfv.get_feature_names_out()
 
-tfidf_matrix = tf.fit_transform(data['genre_str'])
+tfidf_matrix = tfv.fit_transform(data['genre_str'])
 
 tfidf_matrix.shape
 
@@ -171,7 +248,7 @@ tfidf_matrix.shape
 
 pd.DataFrame(
     tfidf_matrix.todense(),
-    columns=tf.get_feature_names_out(),
+    columns=tfv.get_feature_names_out(),
     index=data['name']
 ).sample(10, axis=1).sample(5, axis=0)
 
@@ -218,3 +295,130 @@ data[data['name'].str.contains(anime_input, case=False)]
 
 # Get top-N Recommendations based from anime input list
 anime_recommendations('Kizumonogatari I: Tekketsu-hen', k=10)
+
+"""# Model Development with Collaborative Filtering
+
+## Create a RecommenderNet Class
+"""
+
+class RecommenderNet(tf.keras.Model):
+
+  # Function initialization
+  def __init__(self, num_users, num_anime, embedding_size, **kwargs):
+    super(RecommenderNet, self).__init__(**kwargs)
+    self.num_users = num_users
+    self.num_anime = num_anime
+    self.embedding_size = embedding_size
+    self.user_embedding = layers.Embedding(
+        num_users,
+        embedding_size,
+        embeddings_initializer = 'he_normal',
+        embeddings_regularizer = keras.regularizers.l2(1e-6)
+    )
+    self.user_bias = layers.Embedding(num_users, 1)
+    self.anime_embedding = layers.Embedding(
+        num_anime,
+        embedding_size,
+        embeddings_initializer = 'he_normal',
+        embeddings_regularizer = keras.regularizers.l2(1e-6)
+    )
+    self.anime_bias = layers.Embedding(num_anime, 1)
+
+  def call(self, inputs):
+    user_vector = self.user_embedding(inputs[:, 0])
+    user_bias = self.user_bias(inputs[:, 0])
+    anime_vector = self.anime_embedding(inputs[:, 1])
+    anime_bias = self.anime_bias(inputs[:, 1])
+
+    dot_user_anime = tf.tensordot(user_vector, anime_vector, 2)
+
+    x = dot_user_anime + user_bias + anime_bias
+
+    return tf.nn.sigmoid(x)
+
+"""## Model Compile"""
+
+model = RecommenderNet(num_users, num_anime, 100)
+
+model.compile(
+    loss=tf.keras.losses.BinaryCrossentropy(),
+    optimizer=keras.optimizers.Adam(learning_rate=0.001),
+    metrics=[tf.keras.metrics.MeanAbsoluteError()]
+)
+
+"""## Model Training"""
+
+modelku = model.fit(
+    x = x_train,
+    y = y_train,
+    batch_size = 48,
+    epochs=100,
+    validation_data=(x_val, y_val)
+)
+
+"""## Metrics Visualization"""
+
+plt.plot(modelku.history['mean_absolute_error'])
+plt.plot(modelku.history['val_mean_absolute_error'])
+plt.title('model_metrics')
+plt.ylabel('mean_absolute_error')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+
+"""## Getting top-N Recommendations"""
+
+anime_df = anime_final
+
+# get sample user
+user_id = rating.user_id.sample(1).iloc[0]
+anime_watched_by_user = rating[rating.user_id == user_id]
+
+anime_not_watched = anime_df[~anime_df['anime_id'].isin(anime_watched_by_user.anime_id.values)]['anime_id']
+anime_not_watched = list(
+    set(anime_not_watched)
+    .intersection(set(anime_to_anime_encoded.keys()))
+)
+
+anime_not_watched = [[anime_to_anime_encoded.get(x)] for x in anime_not_watched]
+user_encoder = user_to_user_encoded.get(user_id)
+user_anime_array = np.hstack(
+    ([[user_encoder]] * len(anime_not_watched), anime_not_watched)
+)
+
+ratings = model.predict(user_anime_array).flatten()
+print(ratings)
+
+top_ratings_indices = ratings.argsort()[-10:][::1]
+print(top_ratings_indices)
+recommended_anime_ids = [
+    anime_encoded_to_anime.get(anime_not_watched[x][0]) for x in top_ratings_indices
+]
+print(recommended_anime_ids)
+
+print(f"Showing recommendations for user: {user_id}")
+print("===" * 9)
+print("Anime with high ratings from user")
+print("----" * 8)
+
+top_anime_user = (
+    anime_watched_by_user.sort_values(
+        by = 'rating',
+        ascending=False
+    )
+    .head(5)
+    .anime_id.values
+)
+
+anime_df_rows = anime_df[anime_df['anime_id'].isin(top_anime_user)]
+for row in anime_df_rows.itertuples():
+  print(row.name, ":", row.genre)
+
+print('----' * 8)
+print("Top 10 anime recommendations")
+print('----' * 8)
+
+recommended_anime = anime_df[anime_df['anime_id'].isin(recommended_anime_ids)]
+print(anime_df[anime_df['anime_id'].isin([774,895,19])])
+for row in recommended_anime.itertuples():
+  print(row.name, ':', row.genre)
