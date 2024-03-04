@@ -148,17 +148,17 @@ anime_final
 ### Reduce the size of rating dataframe
 """
 
-sample_size = int(len(rating) * 0.0005) # reduce the dataset into 0.05% of the original dataset size
-
-rating = rating.sample(n=sample_size, random_state=69)
-
+rating = rating[:100000]
 print("The size of rating dataset: ", len(rating))
+rating
 
 num_users = len(rating.user_id.unique())
 num_anime = len(rating.anime_id.unique())
 
 print("Total # of users after reduction: ", num_users)
 print("Total # of anime after reduction: ", num_anime)
+
+rating.isnull().sum()
 
 """### Encode the user id and anime id"""
 
@@ -387,19 +387,17 @@ user_anime_array = np.hstack(
 )
 
 ratings = model.predict(user_anime_array).flatten()
-print(ratings)
 
 top_ratings_indices = ratings.argsort()[-10:][::1]
-print(top_ratings_indices)
 recommended_anime_ids = [
     anime_encoded_to_anime.get(anime_not_watched[x][0]) for x in top_ratings_indices
 ]
-print(recommended_anime_ids)
 
 print(f"Showing recommendations for user: {user_id}")
-print("===" * 9)
+print("=" * 40)
+
 print("Anime with high ratings from user")
-print("----" * 8)
+print("-" * 40)
 
 top_anime_user = (
     anime_watched_by_user.sort_values(
@@ -412,13 +410,12 @@ top_anime_user = (
 
 anime_df_rows = anime_df[anime_df['anime_id'].isin(top_anime_user)]
 for row in anime_df_rows.itertuples():
-  print(row.name, ":", row.genre)
+  print(f"{row.name} : {', '.join(row.genre)}")
 
-print('----' * 8)
+print('-' * 40)
 print("Top 10 anime recommendations")
-print('----' * 8)
+print('-' * 40)
 
 recommended_anime = anime_df[anime_df['anime_id'].isin(recommended_anime_ids)]
-print(anime_df[anime_df['anime_id'].isin([774,895,19])])
 for row in recommended_anime.itertuples():
-  print(row.name, ':', row.genre)
+  print(f"{row.name} : {', '.join(row.genre)}")
