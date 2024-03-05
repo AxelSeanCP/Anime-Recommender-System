@@ -77,6 +77,14 @@ rating.describe()
 print("Lowest rating: ", min(rating.rating))
 print("Biggest rating: ", max(rating.rating))
 
+plt.figure(figsize=(10,6))
+plt.hist(rating['rating'], bins=range(-1, 11), color='skyblue', edgecolor='black')
+plt.xlabel('Rating')
+plt.ylabel('Count')
+plt.title('Jumlah masing-masing skor rating')
+plt.grid(axis='y', alpha=0.75)
+plt.show()
+
 num_users = len(rating.user_id.unique())
 num_anime = len(rating.anime_id.unique())
 
