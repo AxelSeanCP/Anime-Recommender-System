@@ -6,11 +6,11 @@ Gambar 1.0 kumpulan karakter anime popular
 # Anime Recommender System
 
 ## Project Overview
-Di zaman digital seperti ini tentu banyak informasi dan hiburan yang beredar, contohnya adalah video game, film hollywood, e-book novel atau komik, dan tentu saja film animasi atau bisa disebut **anime**. Karena banyaknya jenis hiburan tersebut pasti tidak sedikit orang yang suka menonton anime, diantara orang orang itu pun pasti juga memiliki selera yang berbeda dalam menonton anime. 
+Di zaman digital seperti ini tentu banyak informasi dan hiburan yang beredar, contohnya adalah video game, film hollywood, e-book novel atau komik, dan tentu saja film animasi atau bisa disebut **anime**. Karena hal itu ada banyak sekali anime yang beredar di internet dan hal ini dapat membuat orang yang tertarik melihat anime akan kebingungan karena terlalu banyak anime yang mungkin tidak cocok dengan selera mereka[[1]](#1-a-s-girsang1-b-al-faruq1-h-r-herlianto1-and-s-simbolon-collaborative-recommendation-systems-in-users-of-anime-films-journal-of-physics-conference-series-volume-1566-4th-international-conference-on-computing-and-applied-informatics-2019-iccai-2019-26-27-november-2019-medan-indonesia-httpsiopscienceioporgarticle1010881742-659615661012057).
 
 Karena selera yang beragam tentu orang-orang suka membentuk suatu komunitas anime untuk membahas tentang anime yang mereka tonton atau untuk meminta rekomendasi anime untuk ditonton selanjutnya. Namun terkadang rekomendasi yang diberikan tidak selalu cocok karena tiap orang pasti punya selera yang berbeda, contoh orang "A" suka anime dengan tema **fantasy** dan **adventure** lalu meminta rekomendasi ke orang "B" yang suka anime dengan tema **slice-of-life** dan **comedy**, tentu saja rekomendasi dari orang "B" tidak pasti cocok dengan orang "A".
 
-Oleh karena itu penggunaan sistem rekomendasi berbasis machine learning dapat memprediksi rekomendasi anime yang mungkin cocok dengan selera orang masing masing, meskipun tidak dapat memberi 100% kecocokan karena walaupun tema anime yang direkomendasikan sama, masih ada kemungkinan bahwa rekomendasi tersebut tidak cocok.
+Oleh karena itu penggunaan sistem rekomendasi berbasis machine learning dapat membantu memprediksi rekomendasi anime yang mungkin cocok dengan selera orang masing masing. Salah satu teknik rekomendasi yang paling populer adalah **Collaborative Filtering**[[1]](#1-a-s-girsang1-b-al-faruq1-h-r-herlianto1-and-s-simbolon-collaborative-recommendation-systems-in-users-of-anime-films-journal-of-physics-conference-series-volume-1566-4th-international-conference-on-computing-and-applied-informatics-2019-iccai-2019-26-27-november-2019-medan-indonesia-httpsiopscienceioporgarticle1010881742-659615661012057).
 
 Selain itu platform untuk menonton anime seperti Crunchyroll atau Netflix sudah menggunakan sistem rekomendasi machine learning untuk memberikan rekomendasi film/anime yang mungkin cocok dengan usernya masing masing. Hal ini dilakukan untuk meningkatkan pengalaman pengguna dalam menemukan anime yang sesuai selera mereka. Teknik sistem rekomendasi machine learning yang dapat digunakan diantaranya adalah **Content-Based Filtering** dan **Collaborative Filtering**.
 
@@ -19,18 +19,19 @@ Teknik **Content-Based Filtering** dapat merekomendasikan suatu produk (dalam ka
 Sedangkan teknik **Collaborative Filtering** dapat merekomendasikan suatu produk yang mungkin cocok dengan user berdasarkan produk yang disukai user itu di masa lalu dan produk yang disukai orang lain dengan selera yang sama. Contoh, orang "B" suka anime bernama **"Fullmetal Alchemist: Brotherhood"** dan orang "B" sudah memberikan rating sebesar 8.9/10. Selain itu orang "A" juga sudah memberikan rating untuk anime **"Fullmetal Alchemist: Brotherhood"** dan **"Kizumonogatari I: Tekketsu-hen"** dengan rating yang juga cukup tinggi. Maka dapat diasumsikan bahwa orang "B" berkemungkinan besar memiliki selera yang sama dengan orang "A". Lalu, sistem akan merekomendasikan anime yang sudah dirating oleh orang "A" yang belum ditonton oleh orang "B", yaitu **"Kizumonogatari I: Tekketsu-hen"**. 
 
 ## Business Understanding
+Dengan keberhasilan memberikan rekomendasi anime yang sesuai untuk tiap user di suatu platform streaming anime. Maka user akan lebih sering menggunakan platform tersebut dan dapat meningkatkan retensi user. Selain itu user juga akan lebih puas jika hasil rekomendasi animenya sesuai dengan preferensi mereka, yang dapat memberikan potensi peningkatan pendapatan berdasarkan iklan atau member premium.
 
 ### Problem Statement
-- Bagaimana cara mendapatkan rekomendasi anime dengan genre yang mirip dengan anime yang disukai
-- Bagaimana cara medapatkan rekomendasi anime yang mirip dengan anime yang pernah dirating
+- Bagaimana cara mendapatkan rekomendasi anime dengan genre yang mirip dengan anime yang disukai.
+- Bagaimana cara medapatkan rekomendasi anime yang mirip dengan anime yang pernah dirating sebelumnya.
 
 ### Goals
-- Mendapatkan rekomendasi anime berdasarkan genre atau tema dari anime yang disukai
-- Mendapatkan rekomendasi anime berdasarkan anime yang pernah dirating
+- Mendapatkan rekomendasi anime berdasarkan genre atau tema dari anime yang disukai dengan tingkat Recall@K lebih dari 80%.
+- Mendapatkan rekomendasi anime berdasarkan anime yang pernah dirating sebelumnya dengan error lebih kecil dari 50%.
 
 ### Solution Approach
-- Menggunakan teknik **Content-Based Filtering** untuk mendapatkan anime dengan genre yang mirip dengan anime yang disukai 
-- Menggunakan teknik **Collaborative Filtering** untuk mendapatkan rekomendasi anime berdasarkan anime yang pernah dirating
+- Menggunakan teknik **Content-Based Filtering** untuk mendapatkan anime dengan genre yang mirip dengan anime yang disukai.
+- Menggunakan teknik **Collaborative Filtering** untuk mendapatkan rekomendasi anime berdasarkan anime yang pernah dirating.
 
 ## Data Understanding
 Dataset untuk proyek ini dapat didownload melalui [link ini](https://www.kaggle.com/datasets/CooperUnion/anime-recommendations-database). Dalam dataset terdapat 2 file yaitu **anime.csv** dan **rating.csv** yang akan diubah menjadi dataframe
@@ -170,12 +171,12 @@ List of all genre available:  ['Drama' 'Romance' 'School' 'Supernatural' 'Action
 
 ## Modelling and Result
 ### Content-Based Filtering
-Teknik **Content-Based Filtering** merupakan teknik sistem rekomendasi untuk merekomendasikan suatu produk yang memiliki kemiripan dengan produk yang disukai. Teknik ini menggunakan rumus **Cosine Similarity** untuk mendapatkan kecocokan antara produk 1 dengan yang lain.
+Teknik **Content-Based Filtering** merupakan teknik sistem rekomendasi untuk merekomendasikan suatu produk yang memiliki kemiripan dengan produk yang disukai. Dalam kasus ini sistem akan merekomendasikan anime berdasarkan kemiripan genre dengan anime yang disukai pengguna. Teknik ini menggunakan rumus **Cosine Similarity** untuk mendapatkan kecocokan antara produk 1 dengan yang lain.
 
 Formula untuk **Cosine Similarity** adalah:  
 $\displaystyle cos~(\theta) = \frac{A \cdot B}{\|A\| \|B\|}$
 
-Teknik ini menggunakan model **TF-IDF Vectorizer** untuk mendapatkan informasi mengenai genre yang terdapat di setiap anime dan dianggap sebagai fitur. Contohnya adalah sebagai berikut
+Teknik ini menggunakan model **TF-IDF Vectorizer** untuk mendapatkan informasi mengenai genre yang terdapat di setiap anime dan diubah menjadi fitur yang dapat diukur kemiripannya. Contohnya adalah sebagai berikut
 
 |                        Name                        | thriller |    drama |    mecha | sports | police | fantasy |   action |  romance |   kids | horror |
 |:--------------------------------------------------:|---------:|---------:|---------:|-------:|-------:|--------:|---------:|---------:|-------:|--------|
@@ -230,5 +231,134 @@ Hasil rekomendasi
 
 Berdasarkan hasil rekomendasi tersebut dapat dilihat bahwa anime yang direkomendasikan memiliki genre yang mirip dengan input animenya yaitu genre "Vampire".
 
+#### Kelebihan dan Kekurangan Content-Based Filtering
+- Kelebihan: 
+    1. Tidak memerlukan data user lain
+    2. Mampu merekomendasikan item baru, karena menggunakan fitur-fitur dari item itu sendiri yang dapat digunakan untuk memberikan rekomendasi item yang belum pernah dilihat sebelumnya
+- Kekurangan: 
+    1. Rekomendasi kurang beragam, karena cenderung memberi rekomendasi yang mirip dengan item yang disukai sebelumnya
+    2. Tidak mampu menangkap preferensi user yang berubah ubah, seperti perubahan minat atau mencoba hal baru.
+
 ### Collaborative Filtering
-keywords: model recommender net, metrik evaluasi MAE
+Teknik **Collaborative Filtering** merupakan teknik sistem rekomendasi untuk merekomendasikan suatu produk berdasarkan kesamaan preferensi antar user. Dalam kasus ini sistem akan menggunakan anime yang dirating tinggi oleh user untuk mencari kesamaan dengan user lain.
+
+Proyek ini menggunakan model **RecommenderNet** yang dibuat dari kelas **Model** milik **Keras**. Dan kemudian dicompile menggunakan metrik **Mean Absolute Error**, loss function **Binary Crossentropy**, dan optimizer **Adam**. Dan kemudian model dapat dilatih.
+
+#### Mendapatkan top-N rekomendasi
+Pertama ambil dulu user secara acak dari dataframe rating. Kemudian tunjukkan anime anime yang telah dirating oleh user tersebut.
+```
+Showing recommendations for user: 618
+========================================
+Anime with high ratings from user
+----------------------------------------
+Mononoke Hime : Action, Adventure, Fantasy
+Great Teacher Onizuka : Comedy, Drama, School, Shounen, Slice of Life
+Bakuman. 3rd Season : Comedy, Drama, Romance, Shounen
+Beck : Comedy, Drama, Music, Shounen, Slice of Life
+Durarara!! : Action, Mystery, Supernatural
+----------------------------------------
+```
+
+Kemudian akan diambil semua anime yang belum dilihat oleh user, lalu model akan melakukan prediksi berdasarkan anime dengan rating tinggi oleh user dan kemiripannya dengan user lain. Hasilnya akan mendapatkan rekomendasi sebagai berikut
+```
+Top 10 anime recommendations
+----------------------------------------
+Rainbow: Nisha Rokubou no Shichinin : Drama, Historical, Seinen, Thriller
+Ginga Eiyuu Densetsu Gaiden: Senoku no Hoshi, Senoku no Hikari : Action, Military, Sci-Fi, Space
+Arabian Nights: Sindbad no Bouken (TV) : Adventure, Fantasy, Magic, Romance
+Gakkou no Kaidan: Kubinashi Rider!! Shi no Noroi : Horror, Mystery, Supernatural
+Mermaid Forest OVA : Drama, Fantasy, Horror, Mystery
+Akame ga Kill! Recap : Action, Adventure, Fantasy
+Di Gi Charat Christmas Special : Comedy
+Ohayo! Spank : Comedy, Slice of Life
+One Pound Gospel : Comedy, Romance, Seinen, Sports
+Warau Hyouteki : Horror, Mystery
+```
+
+Terlihat bahwa hasil rekomendasi menunjukkan anime yang relevan dengan anime yang telah dirating sebelumnya. Rekomendasi yang diberikan juga bervariasi dan tidak hanya terpatok pada beberapa genre tertentu tidak seperti **Content-Based Filtering**.
+
+#### Kelebihan dan Kekurangan
+- Kelebihan: 
+    1. Mampu memberikan rekomendasi yang lebih personal, karena preferensi dapat dilihat dari rating yang diberikan.
+    2. Dapat menangkap preferensi user yang kompleks
+- Kekurangan:
+    1. Memerlukan data yang banyak untuk dapat memberikan rekomendasi yang akurat
+    2. Mudah terpengaruh efek popularitas yang dapat mengabaikan preferensi pengguna
+
+## Evaluation
+### Evaluasi Content-Based Filtering
+Metrik evaluasi yang digunakan untuk **Content Based Filtering** adalah **Recall@K**.
+
+**Recall@K** adalah metrik yang mengukur proporsi dari item yang relevan di top-K dari keseluruhan item relevan di top-N rekomendasi.
+
+Formula dari Recall@K adalah:
+
+Recall@K = $\displaystyle \frac{\text{item yang relevan di top-K}}{\text{item yang relevan di top-N}}$
+
+Berikut analisa Recall@K untuk hasil rekomendasi **Content-Based Filtering**.
+
+Data untuk uji coba
+| # |              name              |               genre              |
+|--:|:------------------------------:|:--------------------------------:|
+| 0 | Kizumonogatari I: Tekketsu-hen | [Mystery, Supernatural, Vampire] |
+
+Hasil rekomendasi
+
+| # |               name               |                       genre                       |
+|--:|:--------------------------------:|:-------------------------------------------------:|
+| 0 | Vampire Holmes                   | [Comedy, Mystery, Supernatural, Vampire]          |
+| 1 | Kizumonogatari II: Nekketsu-hen  | [Action, Mystery, Supernatural, Vampire]          |
+| 2 | Bakemonogatari                   | [Mystery, Romance, Supernatural, Vampire]         |
+| 3 | Monogatari Series: Second Season | [Comedy, Mystery, Romance, Supernatural, Vampire] |
+| 4 | Shiki Specials                   | [Horror, Mystery, Supernatural, Vampire]          |
+| 5 | Vampire Knight                   | [Drama, Mystery, Romance, Shoujo, Supernatural, Vampire] |
+| 6 | Vampire Knight Guilty            | [Drama, Mystery, Romance, Shoujo, Supernatural, Vampire] |
+| 7 | Shiki                            | [Mystery, Supernatural, Thriller, Vampire]        |
+| 8 | Trinity Blood                    | [Action, Supernatural, Vampire]                   |
+| 9 | Dance in the Vampire Bund Recap  | [Action, Supernatural, Vampire]                   |
+
+Seperti di tabel, semua anime memiliki ketiga genre di data uji coba yaitu **"Mystery, Supernatural, Vampire"**. Hal ini menjadikan jumlah item yang relevan di top-N = 10. maka dapat disimpulkan juga untuk jumlah item di top-K akan selalu sama dengan K.
+
+Maka Recall@K untuk
+- K = 5 &rarr; 5/10 * 100% = 50%
+- K = 8 &rarr; 8/10 * 100% = 80%
+- K = 10 &rarr; 10/10 * 100% = 100%
+
+Dapat disimpulkan bahwa rekomendasi yang diberikan memiliki Recall@K sebesar 100%.
+
+### Evaluasi Collaborative Filtering
+Metrik evaluasi yang digunakan untuk **Collaborative Filtering** adalah **Mean Absolute Error (MAE)**
+
+MAE atau Mean Absolute Error diterapkan dengan cara mengukur rata-rata dari selisih absolut antara prediksi dan nilai asli (y_asli - y_prediksi).
+
+Formula MAE adalah  
+
+MAE = $\displaystyle \sum\frac{|y_i - \hat{y}_i|}{n}$
+
+Dimana:
+MAE = nilai Mean Absolute Error
+y = nilai aktual
+ŷ = nilai prediksi
+i = urutan data
+n = jumlah data
+
+Berikut plot MAE dari model
+
+![model_plot](images/model_plot.png)  
+Gambar 3.0 plot MAE dari model
+
+Dapat dilihat model ini memiliki nilai MAE yang relatif rendah yaitu kurang dari 20% dan tidak mengalami overfitting sehingga cocok untuk melakukan prediksi pada data baru.
+
+## Conclusion
+Berdasarkan evaluasi untuk **Content-Based Filtering** dan **Collaborative Filtering** hasil yang didapat sudah cukup memuaskan. Karena anime yang direkomendasikan dari kedua teknik tersebut sesuai dengan ketentuan rekomendasi untuk teknik masing-masing.
+
+Namun masih terdapat beberapa hal yang masih perlu dikembangkan untuk proyek ini, yaitu
+- Proyek ini masih belum memberikan solusi untuk kasus **Cold Start**. Dimana user baru belum memiliki rating anime maupun jenis anime yang disukai.
+- Pengurangan data pada rating.csv sangat disayangkan karena semakin banyak data untuk collaborative filtering maka rekomendasi yang diberikan bisa lebih akurat.
+    > telah dilakukan percobaan dimana data dikurangi menjadi 4000 sampel dan hasil rekomendasi yang didapatkan tidak berubah (stagnan) untuk semua user meskipun anime yang dirating berbeda.
+- Dibutuhkan solusi untuk mempercepat pelatihan model pada bagian **Collaborative Filtering** dalam melakukan pelatihan menggunakan dataset yang besar (7000000 sampel).
+
+Selain itu proyek ini telah berhasil mencapai tujuan yang ditetapkan yaitu mendapatkan rekomendasi anime berdasarkan genre atau tema dari anime yang disukai dan mendapatkan rekomendasi anime berdasarkan anime yang pernah dirating sebelumnya.
+
+## References
+###### [1] A S Girsang1, B Al Faruq1, H R Herlianto1 and S Simbolon, "Collaborative Recommendation Systems in Users of Anime Films" *Journal of Physics: Conference Series, Volume 1566, 4th International Conference on Computing and Applied Informatics 2019 (ICCAI 2019) 26-27 November 2019, Medan, Indonesia* https://iopscience.iop.org/article/10.1088/1742-6596/1566/1/012057
